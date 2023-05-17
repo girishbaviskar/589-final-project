@@ -2,20 +2,9 @@
 
 import numpy as np
 import pandas as pd
+from sklearn import datasets
 from models.helpers.helper import read_data_file, splitArgumentsAndLabel, calculate_recall, calculate_precision, calculate_f1_score
-
-
-
-
-#import dataset
-# def readDataFile():
-#     df = pd.read_csv('../../datasets/loan.csv')
-#     #print(df.head().to_string())
-#
-#     return df
-
-
-
+from backprop_digits import calculate_precision_recall
 
 #Shuffle the dataset
 #sklearn train_test_split function by default shuffles the data so this is optional
@@ -32,38 +21,11 @@ def splitTrainAndTest(X,y,test_size):
     from sklearn.model_selection import train_test_split
     return train_test_split(X, y,test_size = test_size)
 
-
-#normalize
 def normalize(data):
     from sklearn.preprocessing import MinMaxScaler
     scaler = MinMaxScaler()
     return scaler.fit_transform(data)
-    
 
-
-
-#normalize all parameters
-#minTrainColumnValues = X_train.min(axis=0)
-#maxTrainColumnValues = X_train.max(axis=0)
-#print(minTrainColumnValues)
-#print(maxTrainColumnValues)
-#def normalize(data, minVal, maxVal):
-#    normData=np.array;
-#    for x in data: 
-#        x = (x-minVal)/(maxVal-minVal) 
-#        normData.append(x)
-#    return normData
-#ret = normalize(X_train[:,:1], minColumnValues[0], maxTrainColumnValues[0])
-#print(type(ret))
-
-
-#todo convert y to numerical class values?
-# k-NN model
-    #calculate euclidian distance
-    #sort
-    #take first k nearest one 
-    #find out majority label from k 
-  
     
 def calculateEuclidianDistance(X1, X2):
     sub = X1-X2
@@ -73,11 +35,6 @@ def calculateEuclidianDistance(X1, X2):
     return dist
 
 
-#print(calculateEuclidianDistance(X_train[0], X_train[1]))     
-#print(X_train.shape)
-
-
-
 def calculateAccuracy(listOfPredictedLabels, listOfActualLabels): 
     if(len(listOfPredictedLabels) == len(listOfActualLabels)):
         correctCount = 0;
@@ -85,8 +42,7 @@ def calculateAccuracy(listOfPredictedLabels, listOfActualLabels):
             #print(label)
             if label == listOfActualLabels[index]:
                 correctCount += 1 
-        return ((correctCount/len(listOfPredictedLabels)) * 100)
-
+        return ((correctCount/len(listOfPredictedLabels)))
 
 
 def calculate_confusion_matrix(y_test, y_pred):
@@ -121,17 +77,10 @@ def calculate_std_deviation(X, mean):
     res = variance ** 0.5
     return res
 
-
-
-#model definition
-#classCount index vs classLabel
-#0- Iris-setosa
-#1- Iris-versicolor
-#2- Iris-virginica
 def knn_model(trainData, testPoint, k, y_train):
     #calculate distances with all points in trainData
     distanceDict = {}
-    classCount = [0,0]
+    classCount = [0,0,0,0,0,0,0,0,0,0]
     for index, x1 in enumerate(trainData):
         dist = 0
         dist = calculateEuclidianDistance(x1,testPoint)
@@ -145,6 +94,22 @@ def knn_model(trainData, testPoint, k, y_train):
             classCount[0] += 1
         elif y_train[neighbour[0]] == 1:
             classCount[1] += 1
+        elif y_train[neighbour[0]] == 2:
+            classCount[2] += 1
+        elif y_train[neighbour[0]] == 3:
+            classCount[3] += 1
+        elif y_train[neighbour[0]] == 4:
+            classCount[4] += 1
+        elif y_train[neighbour[0]] == 5:
+            classCount[5] += 1
+        elif y_train[neighbour[0]] == 6:
+            classCount[6] += 1
+        elif y_train[neighbour[0]] == 7:
+            classCount[7] += 1
+        elif y_train[neighbour[0]] == 8:
+            classCount[8] += 1
+        elif y_train[neighbour[0]] == 9:
+            classCount[9] += 1
         # else:
         #     classCount[2] += 1
     #find the class with majority
@@ -155,23 +120,42 @@ def knn_model(trainData, testPoint, k, y_train):
         predictedLabel = 0
     elif indexOfMax == 1:
         predictedLabel = 1
-    # else:
-    #     predictedLabel = 'Iris-virginica'
-    
+    elif indexOfMax == 2:
+        predictedLabel = 2
+    elif indexOfMax == 3:
+        predictedLabel = 3
+    elif indexOfMax == 4:
+        predictedLabel = 4
+    elif indexOfMax == 5:
+        predictedLabel = 5
+    elif indexOfMax == 6:
+        predictedLabel = 6
+    elif indexOfMax == 7:
+        predictedLabel = 7
+    elif indexOfMax == 8:
+        predictedLabel = 8
+    elif indexOfMax == 9:
+        predictedLabel = 9
+
     return predictedLabel
 
 
-def runKNNforOneValueOfK(k):
-    listOfPredictedLabels = []
-    for x in X_train:
-        predictedLabel = knn_model(X_train, x, k , y_train.to_numpy(), y_test)
-        listOfPredictedLabels.append(predictedLabel)
-        #print(predictedLabel)
-    acc = calculateAccuracy(listOfPredictedLabels, list(y_train[4]))  
-    print(acc)
+# def runKNNforOneValueOfK(k):
+#     listOfPredictedLabels = []
+#     for x in X_train:
+#         predictedLabel = knn_model(X_train, x, k , y_train.to_numpy(), y_test)
+#         listOfPredictedLabels.append(predictedLabel)
+#         #print(predictedLabel)
+#     acc = calculateAccuracy(listOfPredictedLabels, list(y_train[4]))
+#     print(acc)
 
-def runKNNforAllValuesOfK(dataSet, run_norm): 
-    dfret = read_data_file('../../datasets/parkinsons.csv')
+def runKNNforAllValuesOfK(dataSet, run_norm):
+    digits = datasets.load_digits(return_X_y=True)
+    digits_dataset_X = digits[0]
+    dfret_x = pd.DataFrame(digits_dataset_X)
+    digits_dataset_y = digits[1]
+    dfret_y = pd.DataFrame(digits_dataset_y)
+    dfret = pd.concat([dfret_x, dfret_y], axis=1)
     #run for all odd values of k from 0 to 50
     listOfAvgAccuracies = []
     listOfValuesOfK = []
@@ -185,7 +169,6 @@ def runKNNforAllValuesOfK(dataSet, run_norm):
                 #shuffle and split here  
                 df = shuffleData(dfret)
                 X, y = splitArgumentsAndLabel(df)
-                #one_hot_encoded_data_X = pd.get_dummies(X, columns=['Gender', 'Married', 'Education', 'Self_Employed','Property_Area', 'Dependents'], dtype=int)
                 X_train, X_test, y_train, y_test = splitTrainAndTest(X, y, 0.2)
                 if run_norm == True:
                     X_train = normalize(X_train)
@@ -203,10 +186,7 @@ def runKNNforAllValuesOfK(dataSet, run_norm):
                 for x in dataToCompute:
                     predictedLabel = knn_model(X_train, x, k, y_train.to_numpy())
                     listOfPredictedLabels.append(predictedLabel)
-                #print(listOfPredictedLabels)
-                tp, tn, fp, fn = calculate_confusion_matrix(list(dataToCompare.to_numpy().flatten()), listOfPredictedLabels)
-                precision = calculate_precision(tp, fp)
-                recall = calculate_recall(tp, fn)
+                precision, recall = calculate_precision_recall(list(dataToCompare.to_numpy().flatten()), listOfPredictedLabels)
                 f1_score = calculate_f1_score(precision, recall)
                 acc = calculateAccuracy(listOfPredictedLabels, list(dataToCompare.to_numpy().flatten()))
                 accuracySum += acc
