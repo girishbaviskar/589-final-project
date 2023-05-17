@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     # To test House Votes dataset
     #All HyperParameters for the model
-    reg_lambda = 0.1
+    reg_lambda = 0.01
     neurons_per_layer = [20, 4, 4, 2]  # bias terms are not included in this architecture
     iterations = 300
     mini_batch_size = 100
