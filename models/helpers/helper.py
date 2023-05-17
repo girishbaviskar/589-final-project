@@ -29,6 +29,9 @@ def stratified_k_fold(y, n_classes):
     if n_classes == 3:
         for (c1, c2, c3) in zip(*class_indexes_split):
             folds.append(np.concatenate((c1, c2, c3)))
+    if n_classes == 10:
+        for (c1, c2, c3, c4, c5, c6, c7, c8, c9, c10) in zip(*class_indexes_split):
+            folds.append(np.concatenate((c1, c2, c3, c4, c5, c6, c7, c8, c9, c10)))
     for i in range(k):
         list1 = list(range(k))
         list1.remove(i)
@@ -50,8 +53,9 @@ def initialize_weights(neurons_per_layer):
 def normalize_features(X, max_vals, min_vals):
     X = X - min_vals
 
-    # Divide by the range of each feature
     range_vals = max_vals - min_vals
+    range_vals = np.where(range_vals == 0, 1, range_vals)
+
     X = X / range_vals
 
     return X
