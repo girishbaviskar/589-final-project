@@ -46,11 +46,7 @@ if __name__ == "__main__":
 
 
     X, y, folds_indexes_list  = test_back_prop_parkinsons_dataset()
-    # mapping = {'N': 0, 'Y': 1}
-    # y = np.array([mapping[label] for label in y])
-    #todo drop loan id column
-    # X = X[:, 1:]
-    # X = X.astype(float)
+
     number_of_layers = len(neurons_per_layer)
     m = len(X)
     J = 0
