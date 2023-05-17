@@ -7,15 +7,6 @@ from models.helpers.helper import read_data_file, splitArgumentsAndLabel, calcul
 
 
 
-#import dataset
-# def readDataFile():
-#     df = pd.read_csv('../../datasets/loan.csv')
-#     #print(df.head().to_string())
-#
-#     return df
-
-
-
 
 #Shuffle the dataset
 #sklearn train_test_split function by default shuffles the data so this is optional
