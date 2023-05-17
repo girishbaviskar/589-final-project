@@ -2,7 +2,7 @@
 
 import numpy as np
 import pandas as pd
-from helper import read_data_file, splitArgumentsAndLabel, calculate_recall, calculate_precision, calculate_f1_score
+from models.helpers.helper import read_data_file, splitArgumentsAndLabel, calculate_recall, calculate_precision, calculate_f1_score
 
 
 

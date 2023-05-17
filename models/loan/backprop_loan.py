@@ -3,9 +3,9 @@ import pandas as pd
 from numpy import number
 from pip._internal import network
 
-from helper import initialize_weights, read_data_file, splitArgumentsAndLabel, stratified_k_fold, normalize_features, \
+from models.helpers.helper import initialize_weights, read_data_file, splitArgumentsAndLabel, stratified_k_fold, normalize_features, \
     one_hot_encode, calculate_precision, calculate_recall, calculate_f1_score, plotGraph
-from models.loan.backprop_helper import forward_propagation, back_propagation, calculate_reg_gradients, update_weights, \
+from models.helpers.backprop_helper import forward_propagation, back_propagation, calculate_reg_gradients, update_weights, \
     make_predictions, calculate_accuracy
 
 # def read_data_file(path):
