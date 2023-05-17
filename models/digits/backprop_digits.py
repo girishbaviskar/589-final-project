@@ -1,7 +1,8 @@
 import numpy as np
 from sklearn import datasets
-from models.helpers.helper import initialize_weights, read_data_file, splitArgumentsAndLabel, stratified_k_fold, normalize_features, \
-    one_hot_encode, calculate_precision, calculate_recall, calculate_f1_score
+from models.helpers.helper import initialize_weights, read_data_file, splitArgumentsAndLabel, stratified_k_fold, \
+    normalize_features, \
+    one_hot_encode, calculate_precision, calculate_recall, calculate_f1_score, plotGraph
 from models.helpers.backprop_helper import forward_propagation, back_propagation, calculate_reg_gradients, update_weights, \
     make_predictions, calculate_accuracy
 
@@ -60,7 +61,7 @@ if __name__ == "__main__":
     # To test Handwritten Digits dataset
     #All HyperParameters for the model
     reg_lambda = 0.1
-    neurons_per_layer = [64, 8, 8, 10] # bias terms are not included in this architecture
+    neurons_per_layer = [64, 4, 4, 10] # bias terms are not included in this architecture
     iterations = 700
     mini_batch_size = 500
     alpha = .7
@@ -76,9 +77,10 @@ if __name__ == "__main__":
     c = 1
     list_of_accuracies_for_folds = []
     list_of_f1_for_folds = []
-    list_of_J_for_each_instance = []
+    list_of_j_for_folds = []
     for train, test in folds_indexes_list:
         print("Training fold ", c)
+        list_of_J_for_each_batch = []
         final_weights = {}
         weights = initialize_weights(neurons_per_layer)
         J = 0
@@ -121,8 +123,10 @@ if __name__ == "__main__":
                         #J += np.sum(J_i)
                     if debug_mode : print('Cost, J, associated with instance ', i + 1, J_i)
                     J_b += J_i
-                #J_i /= len(mini_batch_size)
+
+                #J_i /= mini_batch_size
                 J += J_b
+                list_of_J_for_each_batch.append(J_b[0]/mini_batch_size)
 
 
                 #calculate reg gradients
@@ -140,8 +144,7 @@ if __name__ == "__main__":
                     S += np.sum(np.square(weights[key]))
             S *= reg_lambda / (2 * mini_batch_size)
             cost = J + S
-            list_of_J_for_each_instance.append(cost)
-            print('Final (regularized) cost, J, based on the batch training set:', cost)
+            if debug_mode: print('Final (regularized) cost, J, based on the batch training set:', cost)
 
     #predict
 
@@ -153,10 +156,16 @@ if __name__ == "__main__":
         print('f1 score', c, f1_score)
         list_of_accuracies_for_folds.append(acc)
         list_of_f1_for_folds.append(f1_score)
+        list_of_j_for_folds.append(list_of_J_for_each_batch)
         c += 1
     avg_acc = np.mean(list_of_accuracies_for_folds, axis=0)
     avg_f1 = np.mean(list_of_f1_for_folds, axis=0)
-    #plotGraph(range(m), list_of_J_for_each_instance, 'Error(J) vs n_instances for housevotes dataset', "J","N_instances", 0)
+    mean_list = []
+    for row in zip(*list_of_j_for_folds):
+        mean = sum(row) / len(row)
+        mean_list.append(mean)
+    x_axis_val = list(range(len(mean_list)))
+    plotGraph(x_axis_val, mean_list, 'Error(J) vs number batch for digits dataset', "N_batches", "J", 0)
     print('Arch of NN: ', neurons_per_layer)
     print('reg lambda:', reg_lambda)
     print('alpha: ', alpha)
