@@ -59,12 +59,11 @@ if __name__ == "__main__":
 
     # To test Handwritten Digits dataset
     #All HyperParameters for the model
-    reg_lambda = 0.01
-    neurons_per_layer = [64, 4, 4, 10] # bias terms are not included in this architecture
-    iterations = 500
+    reg_lambda = 0.1
+    neurons_per_layer = [64, 8, 8, 10] # bias terms are not included in this architecture
+    iterations = 700
     mini_batch_size = 500
-    alpha = 0.5
-
+    alpha = .7
 
     X, y, folds_indexes_list  = test_back_prop_parkinsons_dataset()
 
