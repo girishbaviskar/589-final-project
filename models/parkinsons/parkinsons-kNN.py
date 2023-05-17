@@ -27,14 +27,6 @@ def shuffleData(dataFrame):
     #return df_shuffled
 
 
-#
-# def splitArgumentsAndLabel(df_shuffled):
-#     X = df_shuffled.iloc[:, :-1]
-#     y = df_shuffled.iloc[:, -1:]
-#     return X, y
-
-
-
 
 def splitTrainAndTest(X,y,test_size):
     from sklearn.model_selection import train_test_split
@@ -102,13 +94,13 @@ def calculateAccuracy(listOfPredictedLabels, listOfActualLabels):
 def calculate_confusion_matrix(y_test, y_pred):
     tp = tn = fp = fn = 0
     for i in range(len(y_test)):
-        if y_test[i] == 'Y' and y_pred[i] == 'Y':
+        if y_test[i] == 1 and y_pred[i] == 1:
             tp += 1
-        elif y_test[i] == 'N' and y_pred[i] == 'N':
+        elif y_test[i] == 0 and y_pred[i] == 0:
             tn += 1
-        elif y_test[i] == 'N' and y_pred[i] == 'Y':
+        elif y_test[i] == 0 and y_pred[i] == 1:
             fp += 1
-        elif y_test[i] == 'Y' and y_pred[i] == 'N':
+        elif y_test[i] == 1 and y_pred[i] == 0:
             fn += 1
     return tp, tn, fp, fn
 
@@ -151,9 +143,9 @@ def knn_model(trainData, testPoint, k, y_train):
     topKNeighbours = sortedDict[:k]
     #print(topKNeighbours)
     for neighbour in topKNeighbours:
-        if y_train[neighbour[0]] == 'N':
+        if y_train[neighbour[0]] == 0:
             classCount[0] += 1
-        elif y_train[neighbour[0]] == 'Y':
+        elif y_train[neighbour[0]] == 1:
             classCount[1] += 1
         # else:
         #     classCount[2] += 1
@@ -162,9 +154,9 @@ def knn_model(trainData, testPoint, k, y_train):
     indexOfMax = classCount.index(maxValue)
     predictedLabel = ''
     if indexOfMax == 0:
-        predictedLabel = 'N'
+        predictedLabel = 0
     elif indexOfMax == 1:
-        predictedLabel = 'Y'
+        predictedLabel = 1
     # else:
     #     predictedLabel = 'Iris-virginica'
     
@@ -181,8 +173,7 @@ def runKNNforOneValueOfK(k):
     print(acc)
 
 def runKNNforAllValuesOfK(dataSet, run_norm): 
-    dfret = read_data_file('../../datasets/loan.csv')
-    dfret = dfret.drop('Loan_ID', axis=1)
+    dfret = read_data_file('../../datasets/parkinsons.csv')
     #run for all odd values of k from 0 to 50
     listOfAvgAccuracies = []
     listOfValuesOfK = []
@@ -196,8 +187,8 @@ def runKNNforAllValuesOfK(dataSet, run_norm):
                 #shuffle and split here  
                 df = shuffleData(dfret)
                 X, y = splitArgumentsAndLabel(df)
-                one_hot_encoded_data_X = pd.get_dummies(X, columns=['Gender', 'Married', 'Education', 'Self_Employed','Property_Area', 'Dependents'], dtype=int)
-                X_train, X_test, y_train, y_test = splitTrainAndTest(one_hot_encoded_data_X, y, 0.2)
+                #one_hot_encoded_data_X = pd.get_dummies(X, columns=['Gender', 'Married', 'Education', 'Self_Employed','Property_Area', 'Dependents'], dtype=int)
+                X_train, X_test, y_train, y_test = splitTrainAndTest(X, y, 0.2)
                 if run_norm == True:
                     X_train = normalize(X_train)
                     X_test = normalize(X_test)
@@ -222,7 +213,6 @@ def runKNNforAllValuesOfK(dataSet, run_norm):
                 acc = calculateAccuracy(listOfPredictedLabels, list(dataToCompare.to_numpy().flatten()))
                 accuracySum += acc
                 f1Sum += f1_score
-                #print('Acc for n= '+ str(n)+ ' - ' + str(acc))  
             avgAccu = accuracySum/20
             avgf1 = f1Sum/20
             print('Avg Acc for k= '+ str(k)+ ' - ' + str(avgAccu))
