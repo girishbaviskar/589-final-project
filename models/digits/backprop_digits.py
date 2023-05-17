@@ -1,45 +1,69 @@
 import numpy as np
-
+from sklearn import datasets
 from models.helpers.helper import initialize_weights, read_data_file, splitArgumentsAndLabel, stratified_k_fold, normalize_features, \
     one_hot_encode, calculate_precision, calculate_recall, calculate_f1_score
 from models.helpers.backprop_helper import forward_propagation, back_propagation, calculate_reg_gradients, update_weights, \
     make_predictions, calculate_accuracy
 
-# def read_data_file(path):
-#     df = pd.read_csv(path, delimiter='\t')
-#     return df
 
-def calculate_confusion_matrix(y_test, y_pred):
-    tp = tn = fp = fn = 0
+def calculate_precision_recall(y_test, y_pred):
+    classes = range(10)  # 10 possible values of y_pred and y_test
+    num_classes = len(classes)
+    confusion_matrix = [[0] * num_classes for _ in range(num_classes)]
+
     for i in range(len(y_test)):
-        if y_test[i] == 1 and y_pred[i] == 1:
-            tp += 1
-        elif y_test[i] == 0 and y_pred[i] == 0:
-            tn += 1
-        elif y_test[i] == 0 and y_pred[i] == 1:
-            fp += 1
-        elif y_test[i] == 1 and y_pred[i] == 0:
-            fn += 1
-    return tp, tn, fp, fn
+        true_label = y_test[i]
+        predicted_label = y_pred[i]
+        confusion_matrix[true_label][predicted_label] += 1
+
+    precision = []
+    recall = []
+    for i in range(num_classes):
+        TP = confusion_matrix[i][i]
+        FP = sum(confusion_matrix[j][i] for j in range(num_classes) if j != i)
+        FN = sum(confusion_matrix[i][j] for j in range(num_classes) if j != i)
+        if TP + FP == 0:
+            precision.append(0)
+        else:
+            precision.append(TP / (TP + FP))
+        if TP + FN == 0:
+            recall.append(0)
+        else:
+            recall.append(TP / (TP + FN))
+
+    mean_precision = sum(precision) / num_classes
+    mean_recall = sum(recall) / num_classes
+    return mean_precision, mean_recall
+
 
 def test_back_prop_parkinsons_dataset():
-    pddf = read_data_file('../../datasets/parkinsons.csv')
-    X, y = splitArgumentsAndLabel(pddf)
-    #one_hot_encoded_data_X = pd.get_dummies(X, columns=['Gender', 'Married','Education','Self_Employed','Property_Area', 'Dependents'], dtype=int)
-    X = X.to_numpy()
-    y = y.to_numpy().flatten()
-    folds_indexes_list = stratified_k_fold(y, 2)
-    return X, y, folds_indexes_list
+
+    digits = datasets.load_digits(return_X_y=True)
+    digits_dataset_X = digits[0]
+    digits_dataset_y = digits[1]
+    # N = len(digits_dataset_X)
+    #
+    # # Prints the 64 attributes of a random digit, its class,
+    # # and then shows the digit on the screen
+    # digit_to_show = np.random.choice(range(N), 1)[0]
+    # print("Attributes:", digits_dataset_X[digit_to_show])
+    # print("Class:", digits_dataset_y[digit_to_show])
+    #
+    # plt.imshow(np.reshape(digits_dataset_X[digit_to_show], (8, 8)))
+    # plt.show()
+
+    folds_indexes_list = stratified_k_fold(digits_dataset_y, 10)
+    return digits_dataset_X, digits_dataset_y, folds_indexes_list
 
 if __name__ == "__main__":
 
-    # To test House Votes dataset
+    # To test Handwritten Digits dataset
     #All HyperParameters for the model
     reg_lambda = 0.01
-    neurons_per_layer = [22, 4, 4, 4, 2] # bias terms are not included in this architecture
-    iterations = 1000
-    mini_batch_size = 50
-    alpha = 0.8
+    neurons_per_layer = [64, 4, 4, 10] # bias terms are not included in this architecture
+    iterations = 500
+    mini_batch_size = 500
+    alpha = 0.5
 
 
     X, y, folds_indexes_list  = test_back_prop_parkinsons_dataset()
@@ -64,8 +88,8 @@ if __name__ == "__main__":
         y_train = y[train]
         x_test = X[test]
         y_test = y[test]
-        y_train_encode = one_hot_encode(y_train,2)
-        y_test_encode = one_hot_encode(y_test, 2)
+        y_train_encode = one_hot_encode(y_train,10)
+        y_test_encode = one_hot_encode(y_test, 10)
 
         min_vals = np.min(x_train, axis=0)
         max_vals = np.max(x_train, axis=0)
@@ -124,9 +148,7 @@ if __name__ == "__main__":
 
         y_pred = make_predictions(x_test_reg, final_weights, number_of_layers, False)
         acc = calculate_accuracy(y_pred, y_test)
-        tp, tn, fp, fn = calculate_confusion_matrix(y_test, y_pred)
-        precision = calculate_precision(tp, fp)
-        recall = calculate_recall(tp, fn)
+        precision, recall = calculate_precision_recall(y_test, y_pred)
         f1_score = calculate_f1_score(precision, recall)
         print('Accuracy for fold k', c, acc)
         print('f1 score', c, f1_score)
